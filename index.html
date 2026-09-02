@@ -593,8 +593,12 @@
       forceBtn.disabled = true;
       forceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting session...';
       try {
-        await fetch(`${BACKEND_URL}/disconnect?number=${lastAttemptedNumber}`);
-        await new Promise(r => setTimeout(r, 1000));
+        const dRes = await fetch(`${BACKEND_URL}/disconnect?number=${lastAttemptedNumber}`);
+        const dData = await dRes.json();
+        if (dData.status !== 'success') {
+          throw new Error(dData.message || dData.error || 'Could not clear old session');
+        }
+        await new Promise(r => setTimeout(r, 1500));
         const res = await fetch(`${BACKEND_URL}/code?number=${lastAttemptedNumber}`);
         const data = await res.json();
         if (data.code) {
